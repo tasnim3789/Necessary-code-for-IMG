@@ -1,0 +1,53 @@
+from PIL import Image
+import os
+
+# Define the paths to your image and mask folders
+image_folder = r"E:\CXR DATA\Preprocess\Pneumothorax\images"
+mask_folder = r"E:\CXR DATA\Preprocess\Pneumothorax\masks"
+
+# Define the output folders for resized images and masks
+output_image_folder = r"E:\CXR DATA\resize\PneumothoraxN\images"
+output_mask_folder = r"E:\CXR DATA\resize\PneumothoraxN\masks"
+
+# Define the target size for resizing
+target_width = 128
+target_height = 128
+
+# Ensure the output folders exist, create them if necessary
+os.makedirs(output_image_folder, exist_ok=True)
+os.makedirs(output_mask_folder, exist_ok=True)
+
+# Get a list of image files in the input folder
+image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
+
+# Resize and save images and masks
+for image_file in image_files:
+    # Open the image
+    image = Image.open(os.path.join(image_folder, image_file))
+    
+    # Resize the image to the target size
+    resized_image = image.resize((target_width, target_height), Image.ANTIALIAS)
+    
+    # Save the resized image to the output folder
+    output_image_path = os.path.join(output_image_folder, image_file)
+    resized_image.save(output_image_path)
+
+    # Create the corresponding mask filename by adding "_mask" to the image filename
+    mask_filename = os.path.splitext(image_file)[0] + "_mask" + os.path.splitext(image_file)[1]
+    mask_file = os.path.join(mask_folder, mask_filename)
+    
+    # Check if the mask file exists
+    if os.path.exists(mask_file):
+        # Open the mask
+        mask = Image.open(mask_file)
+        print(mask)
+        
+        # Resize the mask to the target size
+        resized_mask = mask.resize((target_width, target_height), Image.ANTIALIAS)
+        
+        # Save the resized mask to the output folder
+        output_mask_path = os.path.join(output_mask_folder, mask_filename)
+        print(output_mask_path)
+        resized_mask.save(output_mask_path)
+
+print("Resizing and saving completed.")
